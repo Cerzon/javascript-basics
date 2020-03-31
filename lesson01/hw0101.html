@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>JavaScript basics - lesson01 homework task01</title>
+        <meta charset="utf-8">
+        <script>
+            var degreeCelsius;
+            do {
+                degreeCelsius = prompt("Введите температуру в градусах Цельсия");
+            } while(isNaN(degreeCelsius) || degreeCelsius == "");
+            degreeCelsius = parseFloat(degreeCelsius);
+            alert("По шкале Фаренгейта это составляет " + (degreeCelsius * 9 / 5 + 32).toFixed(2) + " градусов");
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
