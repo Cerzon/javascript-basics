@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>JavaScript basics - lesson01 homework task02</title>
+        <meta charset="utf-8">
+        <script>
+            // обмен числовыми значениями между двумя переменными
+            var a = 10, b = 34;
+            console.log("a = " + a + "; b = " + b);
+            // вариант с простой арифметикой
+            b = b + a;
+            a = b - a;
+            b = b - a;
+            console.log("a = " + a + "; b = " + b);
+            // вариант с использованием XOR, не работает, если значения переменных равны
+            a = a ^ b;
+            b = b ^ a;
+            a = a ^ b;
+            console.log("a = " + a + "; b = " + b);
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
