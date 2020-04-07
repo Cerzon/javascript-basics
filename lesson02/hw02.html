@@ -49,8 +49,8 @@
                 если а и b разных знаков, вывести их сумму;
                 ноль можно считать положительным числом. */
 
-            var a = Math.floor(Math.random() * 101) - 50;
-            var b = Math.floor(Math.random() * 101) - 50;
+            var a = Math.round(Math.random() * 100) - 50;
+            var b = Math.round(Math.random() * 100) - 50;
             if (a >= 0 && b >= 0) {
                 console.log(a.toString() + " - " + b.toString() + " = " + (a - b).toString());
             }
@@ -66,7 +66,7 @@
                 С помощью оператора switch организовать вывод чисел от a до 15.
                 */
 
-            a = Math.floor(Math.random() * 16);
+            a = Math.round(Math.random() * 15);
             switch (a) {
                 case 0:
                     console.log(0);
@@ -112,6 +112,14 @@
                     console.error("Ошибка сложения: как минимум один из операндов не является числом");
                     return NaN;
                 }
+                if (first === "" || second === "") {
+                    console.error("Операнд не может быть пустой строкой");
+                    return undefined;
+                }
+                if (Object.is(first, null) || Object.is(second, null)) {
+                    console.error("Операнд не может быть null");
+                    return undefined;
+                }
                 return first / 1 + second / 1;
             }
 
@@ -119,6 +127,14 @@
                 if (isNaN(first) || isNaN(second)) {
                     console.error("Ошибка вычитания: как минимум один из операндов не является числом");
                     return NaN;
+                }
+                if (first === "" || second === "") {
+                    console.error("Операнд не может быть пустой строкой");
+                    return undefined;
+                }
+                if (Object.is(first, null) || Object.is(second, null)) {
+                    console.error("Операнд не может быть null");
+                    return undefined;
                 }
                 return first - second;
             }
@@ -128,6 +144,14 @@
                     console.error("Ошибка умножения: как минимум один из операндов не является числом");
                     return NaN;
                 }
+                if (first === "" || second === "") {
+                    console.error("Операнд не может быть пустой строкой");
+                    return undefined;
+                }
+                if (Object.is(first, null) || Object.is(second, null)) {
+                    console.error("Операнд не может быть null");
+                    return undefined;
+                }
                 return first * second;
             }
 
@@ -135,6 +159,14 @@
                 if (isNaN(first) || isNaN(second)) {
                     console.error("Ошибка деления: как минимум один из операндов не является числом");
                     return NaN;
+                }
+                if (first === "" || second === "") {
+                    console.error("Операнд не может быть пустой строкой");
+                    return undefined;
+                }
+                if (Object.is(first, null) || Object.is(second, null)) {
+                    console.error("Операнд не может быть null");
+                    return undefined;
                 }
                 if (second == 0) {
                     console.error("Ошибка деления: на ноль делить всё же не хотелось бы");
@@ -144,26 +176,33 @@
             }
 
             /*
+            /////////////// test cases ///////////////
+            //
             console.log("******* СЛОЖЕНИЕ **********");
             console.log(bAdd("87.3", 22));
             console.log(bAdd(-65, 65.02));
             console.log(bAdd("ff", -5));
+            console.log(bAdd("", 9));
             //
             console.log("******* ВЫЧИТАНИЕ *********");
             console.log(bSub("87.3", 22));
             console.log(bSub(-65, 65.02));
             console.log(bSub("ff", -5));
+            console.log(bSub("", 9));
             //
             console.log("******* УМНОЖЕНИЕ *********");
             console.log(bMul("87.3", 22));
             console.log(bMul(-65, 65.02));
             console.log(bMul("ff", -5));
+            console.log(bMul("", 9));
             //
             console.log("******** ДЕЛЕНИЕ **********");
             console.log(bDiv("87.3", 22));
             console.log(bDiv(-65, 65.02));
             console.log(bDiv("ff", -5));
             console.log(bDiv(55.88, "0"));
+            console.log(bDiv("", 9));
+            console.log(bDiv(81, ""));
             */
 
             /*****************************************************************
@@ -173,17 +212,124 @@
                 названием операции. В зависимости от переданного значения
                 операции выполнить одну из арифметических операций
                 (использовать функции из пункта 3) и вернуть полученное
-                значение (использовать switch).
+                значение (использовать switch). */
+            
+            function mathOperation(arg1, arg2, operation) {
+                switch (operation) {
+                    case "+":
+                        return bAdd(arg1, arg2);
+                    case "-":
+                        return bSub(arg1, arg2);
+                    case "*":
+                        return bMul(arg1, arg2);
+                    case "/":
+                        return bDiv(arg1, arg2);
+                    default:
+                        console.error("Запрошенная операция \"" + operation + "\" не поддерживается");
+                        return;
+                }
+            }
 
-            ******************************************************************
-            7.  *Сравнить null и 0. Попробуйте объяснить результат.
+            /*
+            /////////////// test cases ///////////////
+            //
+            console.log("******* СЛОЖЕНИЕ **********");
+            console.log(mathOperation("87.3", 22, "+"));
+            console.log(mathOperation(-65, 65.02, "+"));
+            console.log(mathOperation("ff", -5, "+"));
+            //
+            console.log("******* ВЫЧИТАНИЕ *********");
+            console.log(mathOperation("87.3", 22, "-"));
+            console.log(mathOperation(-65, 65.02, "-"));
+            console.log(mathOperation("ff", -5, "-"));
+            //
+            console.log("******* УМНОЖЕНИЕ *********");
+            console.log(mathOperation("87.3", 22, "*"));
+            console.log(mathOperation(-65, 65.02, "*"));
+            console.log(mathOperation("ff", -5, "*"));
+            //
+            console.log("******** ДЕЛЕНИЕ **********");
+            console.log(mathOperation("87.3", 22, "/"));
+            console.log(mathOperation(-65, 65.02, "/"));
+            console.log(mathOperation("ff", -5, "/"));
+            console.log(mathOperation(55.88, "0", "/"));
+            //
+            console.log("*** ОШИБОЧНЫЙ ПАРАМЕТР ****");
+            console.log(mathOperation("87.3", 22));
+            console.log(mathOperation("87.3", 22, "0"));
+            console.log(mathOperation("87.3", 22, null));
+            */
 
-            ******************************************************************
+            /*****************************************************************
+            7.  *Сравнить null и 0. Попробуйте объяснить результат. */
+
+            console.log("null == 0 -> " + (null == 0));     // false
+            console.log("null === 0 -> " + (null === 0));   // false
+            console.log("null > 0 -> " + (null > 0));       // false
+            console.log("null >= 0 -> " + (null >= 0));     // true
+            console.log("null < 0 -> " + (null < 0));       // false
+            console.log("null <= 0 -> " + (null <= 0));     // true
+
+            // для оптимизации в JavaScript за результат сравнения 'больше
+            // или равно' и 'меньше или равно' принимается инвертированный
+            // результат сравнения тех же значений логическими операторами
+            // 'меньше' и 'больше' соответственно (вместо прохождения по двум
+            // алгоритмам сравнения интерпретатор просто инвертирует результат
+            // одного обратного сравнения)
+
+            /*****************************************************************
             8.  *С помощью рекурсии организовать функцию возведения числа в
                 степень. Формат: function power(val, pow), где val – заданное
-                число, pow – степень.
+                число, pow – степень. */
 
-            *****************************************************************/
+            function power(val, pow) {
+                if (isNaN(val) || isNaN(pow)) {
+                    console.error("Один или оба переданных параметра не являются числом");
+                    return NaN;
+                }
+                if (val === "" || pow === "") {
+                    console.error("Ни число, ни степень не могут быть пустой строкой");
+                    return undefined;
+                }
+                if (Object.is(val, null) || Object.is(pow, null)) {
+                    console.error("Ни число, ни степень не могут быть null");
+                    return undefined;
+                }
+                if (pow % 1 != 0 || pow < 0) {
+                    console.error("Функция работает только с целыми положительными степенями");
+                    return undefined;
+                }
+                switch (pow) {
+                    case 0:
+                        return 1;
+                    case 1:
+                        return val;
+                    default:
+                        if (pow % 2 == 0) {
+                            return power(val * val, pow / 2);
+                        }
+                        else {
+                            return power(val, pow - 1) * val;
+                        }
+                }
+            }
+
+            /*
+            /////////////// test cases ///////////////
+            //
+            console.log("2 ** 10 = " + power(2, 10));
+            console.log("2 ** 33 = " + power(2, 33));
+            console.log("1.6 ** 25 = " + power(1.6, 25));
+            console.log("\"10\" ** 7 = " + power("10", 7));
+            console.log("\"8\" ** \"6\" = " + power("8", "6"));
+            console.log("8 ** 1/3 = " + power(8, 1/3));
+            console.log("8 ** \"b\" = " + power(8, "b"));
+            console.log("3 ** \"-6\" = " + power(3, "-6"));
+            console.log("8 ** \"1\" = " + power(8, "1"));
+            console.log("8 ** \"0\" = " + power(8, "0"));
+            console.log("33 ** \"\" = " + power(8, ""));
+
+            /****************************************************************/
         </script>
     </head>
     <body>
