@@ -11,17 +11,17 @@
             console.log("**** простые числа ****");
             var simple = new Array(101);
             simple.fill(true);
-            var i = 2, j;
-            while(i <= simple.length) {
-                if(simple[i]) {
-                    console.log(i);
-                    j = i * 2;
-                    while(j <= simple.length) {
-                        simple[j] = false;
-                        j += i;
+            var idx = 2, cmpl;
+            while(idx <= simple.length) {
+                if(simple[idx]) {
+                    console.log(idx);
+                    cmpl = idx * 2;
+                    while(cmpl <= simple.length) {
+                        simple[cmpl] = false;
+                        cmpl += idx;
                     }
                 }
-                i++;
+                idx++;
             }
 
             /******************************************************************
