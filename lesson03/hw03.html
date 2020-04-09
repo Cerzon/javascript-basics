@@ -28,13 +28,62 @@
             2.  С этого урока начинаем работать с функционалом интернет-магазина.
                 Предположим, есть сущность корзины. Нужно реализовать функционал
                 подсчета стоимости корзины в зависимости от находящихся в ней
-                товаров. 
+                товаров.
 
             /******************************************************************
             3.  Товары в корзине хранятся в массиве. Задачи:
                 a.  Организовать такой массив для хранения товаров в корзине;
                 b.  Организовать функцию countBasketPrice, которая будет
-                    считать стоимость корзины.
+                    считать стоимость корзины. */
+            
+            console.log("**** упражнения с корзиной ****");
+            var userBasket = [];
+            const good1 = {
+                name: "Тигр плюшевый",
+                price: 99.9
+            };
+            const good2 = {
+                name: "Дурилка картонная",
+                price: 22.22
+            };
+            const good3 = {
+                name: "Рыба сухопутная",
+                price: 150
+            };
+            // поиск товара в корзине
+            function checkBasketSlot(element) {
+                return Object.is(element.good, this);
+            }
+            // некий механизм добавления товаров в корзину
+            userBasket.push({good: good1, amount: 2});
+            userBasket.push({good: good2, amount: 1});
+            userBasket.push({good: good3, amount: 5});
+            // опять же условный механизм добавления количества товара,
+            // уже находящегося в корзине
+            var slotIdx = userBasket.findIndex(checkBasketSlot, good2);
+            if(slotIdx >=0) {
+                userBasket[slotIdx].amount++;
+            }
+            // console.log(basket);
+            // функция подсчета стоимости всей корзины
+            function countBasketPrice(basket) {
+                var total = 0;
+                for(var slot of basket) {
+                    total += slot.good.price * slot.amount;
+                }
+                return total;
+            }
+            // вывод всех позиций корзины для проверки
+            for(var slot of userBasket){
+                // console.log(`${slot.good.name} | ${slot.good.price} | ${slot.amount} | ${slot.good.price * slot.amount}`);
+                var slotRow = slot.good.name + " | ";
+                slotRow += slot.good.price.toFixed(2) + " | ";
+                slotRow += slot.amount + " | ";
+                slotRow += (slot.good.price * slot.amount).toFixed(2);
+                console.log(slotRow);
+            }
+            // вывод стоимости всей корзины
+            console.log(countBasketPrice(userBasket).toFixed(2));
 
             /******************************************************************
             4*. Вывести с помощью цикла for числа от 0 до 9, не используя тело
