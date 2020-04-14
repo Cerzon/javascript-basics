@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кто Хочет Стать Миллионером</title>
+    <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+    <script src="data.js"></script>
+    <script src="game.js"></script> -->
+    <style>
+        body {
+            margin: 0 auto;
+            width: 1000px;
+        }
+        header {
+            margin: 20px 0;
+            border-bottom: 2px solid gray;
+        }
+        header, h3 {
+            text-align: center;
+        }
+        main {
+            margin: 20px 0;
+            width: 100%;
+            display: flex;
+        }
+        section#question {
+            width: 700px;
+            margin: 20px 0;
+        }
+        form#answers {
+            text-align: center;
+        }
+        div#cases {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        div#cases div {
+            margin: 10px 0;
+            width: 50%;
+        }
+        aside#helpers {
+            width: 299px;
+            margin: 20px 0;
+            border-left: 1px solid gray;
+        }
+        #helpers ul {
+            list-style: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Кто Хочет Стать Миллионером</h1>
+        <h2 id="round-count">Раунд Хе</h2>
+        <p id="prize-size">Приз за правильный ответ - Че</p>
+    </header>
+    <main>
+        <section id="question">
+            <h3>Вопрос:</h3>
+            <p>Текст вопроса</p>
+            <h3>Варианты ответа:</h3>
+            <form action="#" id="answers">
+                <div id="cases">
+                    <div id="caseA">
+                        <input type="radio" name="answer" id="inpA" value="A">
+                        <label for="inpA" id="answerA">Ответ A</label>
+                    </div>
+                    <div id="caseB">
+                        <input type="radio" name="answer" id="inpB" value="B">
+                        <label for="inpB" id="answerB">Ответ B</label>
+                    </div>
+                    <div id="caseC">
+                        <input type="radio" name="answer" id="inpC" value="C">
+                        <label for="inpC" id="answerC">Ответ C</label>
+                    </div>
+                    <div id="caseD">
+                        <input type="radio" name="answer" id="inpD" value="D">
+                        <label for="inpD" id="answerD">Ответ D</label>
+                    </div>
+                </div>
+                <input type="submit" value="Ответить">
+            </form>
+        </section>
+        <aside id="helpers">
+            <h3>Подсказки</h3>
+            <ul>
+                <li><button id="half-answers">50% на 50%</button></li>
+                <li><button id="accept-mistake">Право на ошибку</button></li>
+            </ul>
+        </aside>
+    </main>
+</body>
+</html>
