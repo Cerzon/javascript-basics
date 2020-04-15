@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кто Хочет Стать Миллионером</title>
-    <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
-    <script src="data.js"></script>
-    <script src="game.js"></script> -->
+    <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script> -->
     <style>
         body {
             margin: 0 auto;
@@ -16,7 +14,7 @@
             margin: 20px 0;
             border-bottom: 2px solid gray;
         }
-        header, h3 {
+        header, h3, footer {
             text-align: center;
         }
         main {
@@ -62,21 +60,21 @@
             <h3>Варианты ответа:</h3>
             <form action="#" id="answers">
                 <div id="cases">
-                    <div id="caseA">
-                        <input type="radio" name="answer" id="inpA" value="A">
-                        <label for="inpA" id="answerA">Ответ A</label>
+                    <div id="case0">
+                        <input type="radio" name="answer" id="inpA" value="0">
+                        <label for="inpA" id="answer0">Ответ A</label>
                     </div>
-                    <div id="caseB">
-                        <input type="radio" name="answer" id="inpB" value="B">
-                        <label for="inpB" id="answerB">Ответ B</label>
+                    <div id="case1">
+                        <input type="radio" name="answer" id="inpB" value="1">
+                        <label for="inpB" id="answer1">Ответ B</label>
                     </div>
-                    <div id="caseC">
-                        <input type="radio" name="answer" id="inpC" value="C">
-                        <label for="inpC" id="answerC">Ответ C</label>
+                    <div id="case2">
+                        <input type="radio" name="answer" id="inpC" value="2">
+                        <label for="inpC" id="answer2">Ответ C</label>
                     </div>
-                    <div id="caseD">
-                        <input type="radio" name="answer" id="inpD" value="D">
-                        <label for="inpD" id="answerD">Ответ D</label>
+                    <div id="case3">
+                        <input type="radio" name="answer" id="inpD" value="3">
+                        <label for="inpD" id="answer3">Ответ D</label>
                     </div>
                 </div>
                 <input type="submit" value="Ответить">
@@ -85,10 +83,13 @@
         <aside id="helpers">
             <h3>Подсказки</h3>
             <ul>
-                <li><button id="half-answers">50% на 50%</button></li>
-                <li><button id="accept-mistake">Право на ошибку</button></li>
+                <li><button helper-type="half">50% на 50%</button></li>
+                <li><button helper-type="mistake">Право на ошибку</button></li>
             </ul>
         </aside>
     </main>
+    <footer><p></p><button id="play"></button><button id="getout"></button></footer>
+    <script src="data.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
