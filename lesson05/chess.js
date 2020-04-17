@@ -207,6 +207,9 @@ for(var i = 9; i >= 0; i--) {
         chessCell.innerText = i;
         chessCell.className += " reverse-look";
     }
+    else {
+        chessCell.className += " side-row";
+    }
     chessRow.appendChild(chessCell);
     battleField.appendChild(chessRow);
 }
