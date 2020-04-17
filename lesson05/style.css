@@ -1,0 +1,36 @@
+table#chess-board {
+    border: 1px solid beige;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+table#chess-board td {
+    border: 1px solid lightgray;
+    box-sizing: border-box;
+}
+
+td.board-cell {
+    width: 50px;
+    height: 50px;
+    font-size: 40px;
+}
+
+td.black-cell {
+    background-color: lightgray;
+}
+
+td.reverse-look {
+    transform: rotate(180deg);
+}
+
+table#chess-board td.side-column {
+    width: 30px;
+    background-color: lemonchiffon;
+    border: none;
+}
+
+table#chess-board td.side-row {
+    height: 30px;
+    background-color: lemonchiffon;
+    border: none;
+}
