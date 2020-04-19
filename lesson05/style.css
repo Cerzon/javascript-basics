@@ -12,7 +12,7 @@ table#chess-board td {
 td.board-cell {
     width: 50px;
     height: 50px;
-    font-size: 40px;
+    font-size: 34px;
 }
 
 td.black-cell {
@@ -33,4 +33,18 @@ table#chess-board td.side-row {
     height: 30px;
     background-color: lemonchiffon;
     border: none;
+}
+
+div#figure-capture {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 40px;
+    background-color: transparent;
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+    z-index: 9999;
 }

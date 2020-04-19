@@ -166,7 +166,7 @@ var chessFigures = {
     ]
 };
 
-var blackCell = false;
+var isWhiteNext = false, srcCell;
 var battleField = document.querySelector("#chess-board");
 var chessRow, chessCell;
 // рисуем доску
@@ -186,10 +186,10 @@ for(var i = 9; i >= 0; i--) {
         if (i < 9 && i > 0) {
             chessCell.id = `${letter}${i}`;
             chessCell.className = "board-cell";
-            if(blackCell) {
+            if(isWhiteNext) {
                 chessCell.className += " black-cell"
             }
-            blackCell = !blackCell;
+            isWhiteNext = !isWhiteNext;
         }
         else {
             chessCell.innerText = letter;
@@ -203,7 +203,7 @@ for(var i = 9; i >= 0; i--) {
     chessCell = document.createElement("td");
     chessCell.className = "side-column";
     if (i < 9 && i > 0) {
-        blackCell = !blackCell;
+        isWhiteNext = !isWhiteNext;
         chessCell.innerText = i;
         chessCell.className += " reverse-look";
     }
@@ -217,8 +217,66 @@ for(var i = 9; i >= 0; i--) {
 // белые
 for(var figure of chessFigures.white) {
     document.querySelector(`#${figure.cell}`).innerHTML = figure.symbol;
+    document.querySelector(`#${figure.cell}`).style.cursor = "pointer";
 }
 // черные
 for(var figure of chessFigures.black) {
     document.querySelector(`#${figure.cell}`).innerHTML = figure.symbol;
+    document.querySelector(`#${figure.cell}`).style.cursor = "pointer";
 }
+
+// функции для захвата и перемещения фигур по доске
+function boardMouseMoveListener(event) {
+    chessCell.style.left = `${event.clientX + 10}px`;
+    chessCell.style.top = `${event.clientY + 10}px`;
+}
+
+function captureFigure(event) {
+    chessCell.innerHTML = event.target.innerHTML;
+    srcCell = event.target;
+    event.target.innerHTML = "";
+    event.target.style.cursor = "initial";
+    chessCell.style.left = `${event.clientX + 10}px`;
+    chessCell.style.top = `${event.clientY + 10}px`;
+    chessCell.style.display = "block";
+    chessCell.addEventListener("mousemove", boardMouseMoveListener);
+    battleField.addEventListener("mousemove", boardMouseMoveListener);
+}
+
+function releaseFigure(event) {
+    event.target.innerHTML = chessCell.innerHTML;
+    srcCell = null;
+    event.target.style.cursor = "pointer";
+    chessCell.innerHTML = "";
+    chessCell.style.display = "none";
+    chessCell.removeEventListener("mousemove", boardMouseMoveListener);
+    battleField.removeEventListener("mousemove", boardMouseMoveListener);
+}
+
+function boardCellClickListener(event) {
+    if(event.target.innerHTML !== "") {
+        if(Object.is(srcCell, null)) {
+            captureFigure(event);
+        }
+        // else { // check bite possibility
+        // }
+    }
+    else if(!Object.is(srcCell, null)) {
+        if(srcCell === event.target) { // cancel move
+            releaseFigure(event);
+        }
+        else { // check move possibility
+            releaseFigure(event);
+        }
+    }
+}
+
+for(chessCell of battleField.querySelectorAll(".board-cell")) {
+    chessCell.addEventListener("click", boardCellClickListener);
+}
+
+// действия с доской, фигурами и очерёдностью ходов
+chessCell = document.querySelector("#figure-capture");
+srcCell = null;
+isWhiteNext = true;
+
