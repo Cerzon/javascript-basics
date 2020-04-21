@@ -1,0 +1,44 @@
+body {
+    margin: 0 auto;
+    width: 1000px;
+}
+
+div#fullsize {
+    margin: 30px 0;
+    height: 400px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-flow: row;
+    flex-flow: row;
+    justify-content: center;
+}
+
+div#fullsize img, div#fullsize p {
+    display: none;
+}
+
+div#fullsize p {
+    margin-top: 180px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 24px;
+    color: #a2a2a2;
+}
+
+div#thumbnails {
+    margin: 30px 0;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-flow: row;
+    flex-flow: row;
+    justify-content: center;
+}
+
+div#thumbnails img {
+    margin: 5px;
+}
+
+div#thumbnails img.active {
+    margin: 1px;
+    padding: 2px;
+    border: 2px solid lawngreen;
+}
