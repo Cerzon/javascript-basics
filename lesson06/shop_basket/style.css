@@ -110,3 +110,7 @@ div.basket-slot {
     justify-content: space-between;
     align-items: center;
 }
+
+div#basket-total-row {
+    text-align: right;
+}

@@ -1,4 +1,6 @@
+// создание блока для 1 товара
 function productPlace(product) {
+    
     // элементы блока создаются в обратном порядке
     // порядок при отображении меняется за счёт стилей
 
@@ -49,6 +51,7 @@ function productPlace(product) {
     return container;
 }
 
+// создание строки для 1 слота корзины
 function basketSlot(slot) {
 
     var container = document.createElement("div");
@@ -76,7 +79,7 @@ function basketSlot(slot) {
 
     elem = document.createElement("p");
     elem.className = "slot-cost";
-    elem.innerText = (slot.price * slot.amount).toFixed(2) / 1;
+    elem.innerText = (slot.price * slot.amount).toFixed(2);
     container.append(elem);
 
     elem = document.createElement("a");
@@ -89,11 +92,14 @@ function basketSlot(slot) {
     return container;
 }
 
+// поиск товара по артикулу в корзине или списке товаров
 function findProductIdx(item) {
     return item.vendorCode == this;
 }
 
+// добавить товар в корзину
 function addToBasket(event) {
+
     event.preventDefault();
     var amount = parseInt(event.target.parentElement.querySelector("input").value);
     if(amount < 1) {
@@ -117,11 +123,14 @@ function addToBasket(event) {
     updateBasketInfo();
 }
 
+// в просмотре корзины отслеживание изменения поля количества товара
 function amountChanged() {
     isAmountChanged = true;
 }
 
+// в просмотре корзины обработка изменения количества товара, если поле было изменено
 function focusLost(event) {
+
     if(isAmountChanged) {
         isAmountChanged = false;
         var product = event.target.parentElement.getAttribute("product");
@@ -133,29 +142,33 @@ function focusLost(event) {
         }
         else if(amount == 0) {
             basket.splice(idx, 1);
-            document.querySelector("main").removeChild(event.target.parentElement);
+            mainCont.removeChild(event.target.parentElement);
         }
         else {
             basket[idx].amount = amount;
-            event.target.parentElement.querySelector(".slot-cost").innerText = basket[idx].price * amount;
+            event.target.parentElement.querySelector(".slot-cost").innerText = (basket[idx].price * amount).toFixed(2);
         }
         updateBasketInfo();
     }
 }
 
+// в просмотре корзины убрать товар из корзины
 function removeSlot(event) {
+
     event.preventDefault();
     var product = event.target.parentElement.getAttribute("product");
     var idx = basket.findIndex(findProductIdx, product);
     basket.splice(idx, 1);
-    document.querySelector("main").removeChild(event.target.parentElement);
+    mainCont.removeChild(event.target.parentElement);
     if(basket.length == 0) {
-        document.querySelector("main").innerHTML = "<h3>Корзина пуста</h3>";
+        mainCont.innerHTML = "<h3>Корзина пуста</h3>";
     }
     updateBasketInfo();
 }
 
+// обновление информации о состоянии корзины во всех связанных полях
 function updateBasketInfo() {
+
     var amount = 0, total = 0;
     for(var slot of basket) {
         amount += slot.amount;
@@ -163,32 +176,34 @@ function updateBasketInfo() {
     }
     total = total.toFixed(2) / 1;
     if(!basketView) {
-        basketInfo.querySelector("#amount").style.display = "block";
+        
         if(basket.length == 0) {
             basketInfo.querySelector("#amount").innerText = "Корзина пуста";
             basketInfo.querySelector("#total").style.display = "none";
         }
         else {
-            basketInfo.querySelector("#total").style.display = "block";
             basketInfo.querySelector("#amount").innerText = `Товаров в корзине: ${amount}`;
+            basketInfo.querySelector("#total").style.display = "block";
             basketInfo.querySelector("#total").innerText = `на сумму $ ${total}`;
         }
     }
-    return {amount, total};
+    slot = document.querySelector("#basket-total-row");
+    if(slot) {
+        slot.innerText = `Товаров в корзине ${amount} на общую сумму $ ${total}`;
+    }
 }
 
+// переключение между списком товаров и просмотром корзины
 function switchView(event) {
+
+    // обход для стартового вызова функции
     if(Object.is(event, Event)) {
         event.preventDefault();
     }
 
     basketView = !basketView;
-    // чистим контейнер
-    var childItem = document.querySelector("main").firstChild;
-    while(childItem) {
-        document.querySelector("main").removeChild(childItem);
-        childItem = document.querySelector("main").firstChild;
-    }
+
+    mainCont.innerHTML = "";
 
     if(basketView) {
         basketInfo.querySelector("#amount").style.display = "none";
@@ -197,29 +212,35 @@ function switchView(event) {
         // рисуем корзину
         if(basket.length) {
             for(var slot of basket) {
-                document.querySelector("main").append(basketSlot(slot));
+                mainCont.append(basketSlot(slot));
             }
+            slot = document.createElement("div");
+            slot.id = "basket-total-row";
+            mainCont.append(slot);
         }
         else {
-            document.querySelector("main").innerHTML = "<h3>Корзина пуста</h3>";
+            mainCont.innerHTML = "<h3>Корзина пуста</h3>";
         }
-        document.querySelector("main").className = "basket-view";
+        mainCont.className = "basket-view";
     }
     else {
+        basketInfo.querySelector("#amount").style.display = "block";
         basketInfo.querySelector("a").innerText = "Перейти в корзину";
         // рисуем витрину
         for(var product of productList) {
-            document.querySelector("main").append(productPlace(product));
+            mainCont.append(productPlace(product));
         }
-        document.querySelector("main").className = "showcase";
+        mainCont.className = "showcase";
     }
     updateBasketInfo();
 }
 
+// код, выполняющийся при первоначальной загрузке страницы
 var basket = [],
     basketView = true,
     isAmountChanged = false,
-    basketInfo = document.querySelector("#basket-info");
+    basketInfo = document.querySelector("#basket-info"),
+    mainCont = document.querySelector("main");
 
 switchView();
 basketInfo.querySelector("a").addEventListener("click", switchView);
