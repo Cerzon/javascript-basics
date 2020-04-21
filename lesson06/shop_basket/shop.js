@@ -148,7 +148,12 @@ function focusLost(event) {
             basket[idx].amount = amount;
             event.target.parentElement.querySelector(".slot-cost").innerText = (basket[idx].price * amount).toFixed(2);
         }
-        updateBasketInfo();
+        if(basket.length == 0) {
+            mainCont.innerHTML = "<h3>Корзина пуста</h3>";
+        }
+        else {
+            updateBasketInfo();
+        }
     }
 }
 
@@ -174,7 +179,7 @@ function updateBasketInfo() {
         amount += slot.amount;
         total += slot.amount * slot.price;
     }
-    total = total.toFixed(2) / 1;
+    total = total.toFixed(2);
     if(!basketView) {
         
         if(basket.length == 0) {
