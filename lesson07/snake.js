@@ -145,20 +145,20 @@ function kbDispatcher(event) {
     }
 
     var dirMap = {
-        ArrowDown: "down",
-        ArrowLeft: "left",
-        ArrowRight: "right",
-        ArrowUp: "up"
+        37: "left",
+        38: "up",
+        39: "right",
+        40: "down"
     };
     
-    switch (event.code) {
-        case "ArrowDown":
-        case "ArrowLeft":
-        case "ArrowRight":
-        case "ArrowUp":
-            snake.turn(dirMap[event.code]);
+    switch (event.keyCode) {
+        case 37:
+        case 38:
+        case 39:
+        case 40:
+            snake.turn(dirMap[event.keyCode]);
             break;
-        case "Space":
+        case 32:
             if (gamePaused) {
                 resumeGame();
             }
