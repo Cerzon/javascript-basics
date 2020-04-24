@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript basics - lesson05 homework - snake</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Игра "Змейка"</h1>
+        <p>polzaets and zhrets food</p>
+        <p>Game controls: strelki - moving direction | spacebar - pause/resume game</p>
+        <p>Legend:
+            <span class="game-legend snake-body"></span> - snake alive |
+            <span class="game-legend snake-dead"></span> - snake dead |
+            <span class="game-legend food"></span> - yummi food |
+            <span class="game-legend block-post"></span> - deadly block
+        </p>
+    </header>
+    <main>
+        <aside>
+            <header>
+                <h2>Настройки игры</h2>
+            </header>
+            <form action="#" id="params">
+                <div class="input-field">
+                    <label for="field-width" class="input-label">Ширина поля в точках</label>
+                    <input type="number" name="field-width" id="field-width" min="20" max="60" value="20">
+                </div>
+                <div class="input-field">
+                    <label for="field-height" class="input-label">Высота поля в точках</label>
+                    <input type="number" name="field-height" id="field-height" min="20" max="40" value="20">
+                </div>
+                <div class="input-field">
+                    <label for="snake-speed" class="input-label">Скорость змейки, точек в секунду</label>
+                    <input type="number" name="snake-speed" id="snake-speed" min="1" max="20" value="3">
+                </div>
+                <div class="input-checkbox">
+                    <label for="enable-block" class="check-label">Включить препятствия</label>
+                    <input type="checkbox" name="enable-block" id="enable-block">
+                </div>
+                <div class="input-field">
+                    <label for="blocks-amount" class="input-label">Максимум препятствий одновременно</label>
+                    <input type="number" name="blocks-amount" id="blocks-amount" min="1" max="5" value="2">
+                </div>
+                <div class="input-checkbox">
+                    <label for="show-grid" class="check-label">Отображать сетку</label>
+                    <input type="checkbox" name="show-grid" id="show-grid">
+                </div>
+                <div class="input-field">
+                    <label for="cell-size" class="input-label">Предпочтительный размер клетки, px</label>
+                    <input type="number" name="cell-size" id="cell-size" min="5" max="30" value="10">
+                </div>
+                <div class="button-container">
+                    <input type="submit" value="Начать игру">
+                </div>
+            </form>
+            <div class="button-container">
+                <input type="button" value="Пауза" id="pause-game">
+                <input type="button" value="Продолжить" id="resume-game">
+            </div>
+            <div class="button-container">
+                <input type="button" value="Закончить игру" id="stop-game">
+            </div>
+    </aside>
+        <section id="game-board">
+            <header>
+                <h2 id="score-field">Score: 00000</h2>
+            </header>
+            <div id="game-field"></div>
+        </section>
+    </main>
+    <div id="field-veil"></div>
+</body>
+<script src="snake.js"></script>
+</html>
