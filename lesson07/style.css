@@ -96,16 +96,31 @@ input[type="submit"], input[type="button"] {
     color: #fff;
     background-color: royalblue;
     border-radius: 0.4em;
+    border-width: 3px;
+    border-style: solid;
     margin-left: 3px;
     margin-right: 3px;
+}
+
+input[type="submit"]:hover, input[type="button"]:hover {
+    border-style: outset;
+}
+
+input[type="submit"]:active, input[type="button"]:active {
+    border-style: inset;
+}
+
+input[type="checkbox"] {
+    margin-left: 10px;
+    margin-bottom: 5px;
 }
 
 div.input-checkbox {
     display: -ms-flexbox;
     display: flex;
     -ms-flex-flow: row nowrap;
-    flex-flow: row nowrap;
-    justify-content: space-between;
+    flex-flow: row-reverse nowrap;
+    justify-content: flex-end;
     align-items: center;
     margin-bottom: 15px;
 }
@@ -135,10 +150,58 @@ div#game-field {
     flex-flow: row wrap;
 }
 
-div.snake-body {
+.snake-body {
     background-color: green;
 }
 
-div.food {
+.snake-fault {
+    background-color: violet;
+}
+
+.snake-dead {
+    background-color: darkolivegreen;
+}
+
+.food {
     background-color: goldenrod;
+}
+
+.block-post {
+    background-color: black;
+}
+
+span.game-legend {
+    display: inline-block;
+    margin: 0;
+    margin-bottom: -0.15em;
+    padding: 0;
+    width: 0.8em;
+    height: 0.8em;
+    border: 1px solid #ebebeb;
+}
+
+div#field-veil {
+    position: absolute;
+    display: block;
+    height: 0;
+    width: 0;
+    top: 0;
+    left: 0;
+    z-index: 99999;
+    background-color: rgba(0, 0, 0, 0.3);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+div#field-veil.paused {
+    background-image: url("pause.png");
+}
+
+div#field-veil.stopped {
+    background-image: url("stop.png");
+}
+
+div#field-veil.gameover {
+    background-image: url("gameover.png");
 }
