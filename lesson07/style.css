@@ -75,17 +75,16 @@ label {
 }
 
 input[type="number"] {
-    margin: 6px 1px 15px 1px;
+    margin-bottom: 14px;
     width: 100%;
     font-size: 1em;
     background-color: #fff;
     border-radius: 0.3em;
-    border: 1px solid #e0e0e0;
+    border: 2px solid #e0e0e0;
     padding: 0.2em;
 }
 
 input[type="number"]:focus {
-    margin: 0 0 14px 0;
     border: 2px solid skyblue;
 }
 
@@ -162,8 +161,12 @@ div#game-field {
     background-color: darkolivegreen;
 }
 
-.food {
+.yummi-food {
     background-color: goldenrod;
+}
+
+.edible-food {
+    background-color: yellow;
 }
 
 .block-post {
