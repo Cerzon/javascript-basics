@@ -72,17 +72,19 @@ function startGame(event) {
 
     // стартуем нужные объекты и таймеры
     score = 0;
+    incScore(0);
     // змейка начинает ползти сама как только создаётся
     snake = new Snake(snakeSpeed);
-    // блоки тоже начинают спавнится после создания с немного раномными интервалами
+    // препятствия тоже начинают спавнится после создания, интервалы немного рандомные
     if(enableBlock) {
         blocker = []
         for(data = 0; data < blockersMax; data++) {
             blocker.push(new BlockBuilder(blocker.length, 2000 / snakeSpeed));
         }
     }
+    // хавчик создаётся с интервалом в полтора тика после сжирания предыдущего
+    // и портится за 2/5 времени, нужного, чтоб проползти поле из одного угла в другой
     food = new FoodGrower(parseInt(1500 / snakeSpeed), parseInt(400 * (xPoints + yPoints) / snakeSpeed));
-    document.getElementById("score-field").innerText = `Score: ${score.pad(5)}`;
     document.addEventListener("keydown", kbDispatcher);
     gameField.focus();
     gameStarted = true;
