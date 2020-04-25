@@ -71,8 +71,7 @@ function startGame(event) {
     gameField.style.height = `${yPoints * cellSize}px`;
 
     // стартуем нужные объекты и таймеры
-    score = 0;
-    incScore(0);
+    score = initCounter();
     // змейка начинает ползти сама как только создаётся
     snake = new Snake(snakeSpeed);
     // препятствия тоже начинают спавнится после создания, интервалы немного рандомные
@@ -131,6 +130,7 @@ function stopGame(event) {
         blocker = null;
         food.destroy();
         food = null;
+        score = null;
         gameStarted = false;
         gamePaused = false;
         // украшалки
@@ -197,9 +197,13 @@ function checkCell(xPos, yPos) {
 }
 
 // ведем счёт
-function incScore(incSize=1) {
-    score += incSize;
+function initCounter() {
+    var score = 0;
     document.getElementById("score-field").innerText = `Score: ${score.pad(5)}`;
+    return function(inc=0) {
+        score += inc;
+        document.getElementById("score-field").innerText = `Score: ${score.pad(5)}`;
+    }
 }
 
 // сажаем алюминевые огурцы на брезентовом поле
@@ -244,7 +248,7 @@ function FoodGrower(ttc, ttd) {
         if(self.ingameTimerID) {
             clearTimeout(self.ingameTimerID);
         }
-        incScore(self.reward);
+        score(self.reward);
         self.ingameTimerID = setTimeout(self.grow, self.TTC);
     }
 
@@ -520,7 +524,7 @@ function BlockBuilder(ID, ttc, ttl=25000, maxLength=3) {
 // глобальные переменные
 var gameBoard = document.getElementById("game-board"),
     gameField = document.getElementById("game-field"),
-    score = 0,
+    score,
     yPoints = 20,
     xPoints = 20,
     gameStarted = false,
