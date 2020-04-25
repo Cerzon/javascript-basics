@@ -216,7 +216,10 @@ function FoodGrower(ttc, ttd) {
     self.reward = 3;
     self.location = {};
 
+    // засеваем хавчик в поле
     self.grow = function() {
+        self.ingameTimerID = null;
+
         if(gamePaused) {
             self.todo = self.grow;
             self.suspendTimerID = setInterval(self.suspend, self.TTC);
@@ -234,6 +237,7 @@ function FoodGrower(ttc, ttd) {
         self.ingameTimerID = setTimeout(self.decay, self.TTD);
     }
 
+    // хавчик в поле перезрел и подпортился
     self.decay = function() {
         self.ingameTimerID = null;
 
@@ -247,6 +251,7 @@ function FoodGrower(ttc, ttd) {
         self.reward = 1;
     }
 
+    // хавчик был сожран
     self.eat = function() {
         score(self.reward);
         self.location = {};
@@ -254,6 +259,10 @@ function FoodGrower(ttc, ttd) {
         if(self.ingameTimerID) {
             clearTimeout(self.ingameTimerID);
             self.ingameTimerID = null;
+        }
+        if(self.suspendTimerID) {
+            clearInterval(self.suspendTimerID);
+            self.suspendTimerID = null;
         }
 
         if(gamePaused) {
@@ -265,17 +274,21 @@ function FoodGrower(ttc, ttd) {
         self.ingameTimerID = setTimeout(self.grow, self.TTC);
     }
 
+    // игра поставлена на паузу
     self.suspend = function() {
         if(self.ingameTimerID) {
             clearTimeout(self.ingameTimerID);
+            self.ingameTimerID = null;
         }
 
         if(!gamePaused) {
             clearInterval(self.suspendTimerID);
+            self.suspendTimerID = null;
             self.todo();
         }
     }
 
+    // вычищаем садовода
     self.destroy = function() {
         if(self.ingameTimerID) {
             clearTimeout(self.ingameTimerID);
@@ -285,6 +298,7 @@ function FoodGrower(ttc, ttd) {
         }
     }
 
+    // запускаем садовода
     self.ingameTimerID = setTimeout(self.grow, self.TTC);
 }
 
