@@ -14,6 +14,7 @@ function pad(fullLen, leadSymbol="0") {
 // начинаем игру
 function startGame(event) {
     event.preventDefault();
+    
     if(gameStarted) {
         return;
     }
@@ -22,22 +23,29 @@ function startGame(event) {
     var data = new FormData(event.target);
     xPoints = parseInt(data.get("field-width"));
     yPoints = parseInt(data.get("field-height"));
-    snakeSpeed = parseInt(data.get("snake-speed"));
-    var showGrid = data.get("show-grid") === "on";
+    var snakeSpeed = parseInt(data.get("snake-speed"));
     var enableBlock = data.get("enable-block") === "on";
     var blockersMax = parseInt(data.get("blocks-amount"));
+    var showGrid = data.get("show-grid") === "on";
+    var cellSize = parseInt(data.get("cell-size"));
 
     // готовимся генерить поле
-    var cellSize = parseInt(data.get("cell-size"));
-    while(gameBoard.offsetLeft + 60 + cellSize * xPoints > window.innerWidth && cellSize > 4) {
+    // проверяем, что не вывалимся за окно справа
+    while(gameBoard.offsetLeft + 80 + cellSize * xPoints > window.innerWidth && cellSize > 4) {
         cellSize--;
     }
-    while(gameField.offsetTop + cellSize * yPoints > window.innerHeight && cellSize > 4) {
+    // в поисках нижней границы поля
+    data = gameBoard.parentElement.offsetTop + gameBoard.parentElement.offsetHeight + 60;
+    // сравниваем уже существующую нижнюю границу страницы и нижнюю границу окна
+    data = data > window.innerHeight ? data : window.innerHeight;
+    // убираем из расчётов отступы до элемента, содержащего игровое поле
+    data -= gameBoard.parentElement.offsetTop + 60;
+    // проверяем, что не вывалимся снизу за окно или пределы уже существующей высоты страницы
+    while(gameField.offsetTop + cellSize * yPoints > data && cellSize > 4) {
         cellSize--;
     }
     var gfCell = document.createElement("div");
     if(showGrid) {
-        cellSize--;
         gfCell.style.borderRight = "1px solid #ebebeb";
         gfCell.style.borderBottom = "1px solid #ebebeb";
     }
@@ -64,16 +72,19 @@ function startGame(event) {
 
     // стартуем нужные объекты и таймеры
     score = 0;
-    snake = new Snake();
+    incScore(0);
+    // змейка начинает ползти сама как только создаётся
+    snake = new Snake(snakeSpeed);
+    // препятствия тоже начинают спавнится после создания, интервалы немного рандомные
     if(enableBlock) {
         blocker = []
         for(data = 0; data < blockersMax; data++) {
-            blocker.push(new BlockBuilder());
+            blocker.push(new BlockBuilder(blocker.length, 2000 / snakeSpeed));
         }
     }
-    moveTimerID = setInterval(snake.move, parseInt(1000 / snakeSpeed));
-    foodTimerID = setTimeout(growFood, parseInt(4000 / snakeSpeed));
-    document.getElementById("score-field").innerText = `Score: ${score.pad(5)}`;
+    // хавчик создаётся с интервалом в полтора тика после сжирания предыдущего
+    // и портится за 2/5 времени, нужного, чтоб проползти поле из одного угла в другой
+    food = new FoodGrower(parseInt(1500 / snakeSpeed), parseInt(400 * (xPoints + yPoints) / snakeSpeed));
     document.addEventListener("keydown", kbDispatcher);
     gameField.focus();
     gameStarted = true;
@@ -82,7 +93,6 @@ function startGame(event) {
 // ставим игру на паузу
 function pauseGame() {
     if(gameStarted && !gamePaused) {
-        clearInterval(moveTimerID);
         gamePaused = true;
         // украшалки
         gameField.append(document.getElementById("field-veil"));
@@ -96,7 +106,6 @@ function pauseGame() {
 // снимаем игру с паузы
 function resumeGame() {
     if(gameStarted && gamePaused) {
-        moveTimerID = setInterval(snake.move, parseInt(1000 / snakeSpeed));
         gamePaused = false;
         // украшалки
         document.getElementById("field-veil").className = "";
@@ -110,16 +119,20 @@ function resumeGame() {
 // тормозим игру
 function stopGame(event) {
     if(gameStarted) {
-        clearInterval(moveTimerID);
         document.removeEventListener("keydown", kbDispatcher);
+        snake.destroy();
         snake = null;
+        if(blocker) {
+            for(var b of blocker) {
+                b.destroy();
+                b = null;
+            }
+        }
         blocker = null;
+        food.destroy();
+        food = null;
         gameStarted = false;
         gamePaused = false;
-        if(!Object.is(foodTimerID, null)) {
-            clearTimeout(foodTimerID);
-            foodTimerID = null;
-        }
         // украшалки
         if(!event) {
             setTimeout(function() {
@@ -183,46 +196,111 @@ function checkCell(xPos, yPos) {
     return cellToCheck.className === "" ? "free" : cellToCheck.className;
 }
 
-// сажаем алюминевые огурцы на брезентовом поле
-function growFood() {
-    if(gameStarted) {
-        var xPos, yPos;
-        do {
-            xPos = Math.round(Math.random() * (xPoints - 1));
-            yPos = Math.round(Math.random() * (yPoints - 1));
-        } while(checkCell(xPos, yPos) !== "free");
-
-        markCells([{x: xPos, y: yPos}], "food");
-
-        if(!Object.is(foodTimerID, null)) {
-            clearTimeout(foodTimerID);
-            foodTimerID = null;
-        }
-    }
-}
-
 // ведем счёт
 function incScore(incSize=1) {
     score += incSize;
     document.getElementById("score-field").innerText = `Score: ${score.pad(5)}`;
 }
 
+// сажаем алюминевые огурцы на брезентовом поле
+function FoodGrower(ttc, ttd) {
+    var self = this;
+    // задержка на создание новой еды
+    self.TTC = ttc;
+    // задержка до того, как еда попортится (меньше очков)
+    self.TTD = ttd;
+    self.reward = 3;
+    self.location = {};
+
+    self.grow = function() {
+        if(gamePaused) {
+            self.todo = self.grow;
+            self.suspendTimerID = setInterval(self.suspend, self.TTC);
+        }
+
+        do {
+            self.location.x = Math.round(Math.random() * (xPoints - 1));
+            self.location.y = Math.round(Math.random() * (yPoints - 1));
+        } while(checkCell(self.location.x, self.location.y) !== "free");
+
+        markCells([self.location], "yummi-food");
+        self.reward = 3;
+
+        self.ingameTimerID = setTimeout(self.decay, self.TTD);
+    }
+
+    self.decay = function() {
+        if(gamePaused) {
+            self.todo = self.decay;
+            self.suspendTimerID = setInterval(self.suspend, self.TTC);
+        }
+
+        self.ingameTimerID = null;
+        markCells([self.location], "edible-food");
+        self.reward = 1;
+    }
+
+    self.eat = function() {
+        if(self.ingameTimerID) {
+            clearTimeout(self.ingameTimerID);
+        }
+        incScore(self.reward);
+        self.ingameTimerID = setTimeout(self.grow, self.TTC);
+    }
+
+    self.suspend = function() {
+        if(!gamePaused) {
+            clearInterval(self.timerID);
+            self.todo();
+        }
+    }
+
+    self.destroy = function() {
+        if(self.ingameTimerID) {
+            clearTimeout(self.ingameTimerID);
+        }
+        if(self.suspendTimerID) {
+            clearInterval(self.suspendTimerID);
+        }
+    }
+
+    self.ingameTimerID = setTimeout(self.grow, self.TTC);
+}
+
 // конструктор змейки
-function Snake(bodyLen=2) {
+function Snake(speed, bodyLen=2) {
     // поскольку движение будет запускаться через таймер,
     // переменная this будет содержать объект window вместо
     // самой змейки; обходим это через альтернативное имя
     var self = this;
+    self.direction = "up";
+    self.canTurn = true;
+    self.turnBuffer = false;
+    self.speed = speed;
+
     self.head = {x: parseInt(xPoints / 2), y: parseInt(yPoints / 2)};
     self.body = [];
     for(var i = bodyLen - 1; i > 0; i--) {
         self.body.push({x: self.head.x, y: self.head.y + i});
     }
-    self.direction = "up";
-    self.canTurn = true;
-    self.turnBuffer = false;
+    // рисуем созданную змейку
+    markCells(self.body.concat([self.head]), "snake-body");
+
+    self.resume = function() {
+        if(!gamePaused) {
+            clearInterval(self.timerID);
+            self.timerID = setInterval(self.move, parseInt(1000 / self.speed));
+        }
+    }
+
+    self.destroy = function() {
+        clearInterval(self.timerID);
+    }
 
     self.turn = function(newDirection) {
+        if(gamePaused) {
+            return;
+        }
         // уменьшаем влияние спорадических нервных нажатий на стрелки
         if((self.canTurn || (!self.canTurn && !self.turnBuffer))
             && newDirection === self.direction) {
@@ -272,6 +350,12 @@ function Snake(bodyLen=2) {
     }
 
     self.move = function() {
+        if(gamePaused) {
+            clearInterval(self.timerID);
+            self.timerID = setInterval(self.resume, parseInt(1000 / self.speed));
+            return;
+        }
+
         self.body.push({x: self.head.x, y: self.head.y});
         switch(self.direction) {
             case "up":
@@ -306,9 +390,10 @@ function Snake(bodyLen=2) {
                 // убираем хвост
                 markCells(self.body.splice(0, 1));
                 break;
-            case "food":
-                growFood();
-                incScore();
+            case "yummi-food":
+            case "edible-food":
+                // жрём что досталось
+                food.eat();
                 break;
             case "snake-body":
             case "block-post":
@@ -339,14 +424,17 @@ function Snake(bodyLen=2) {
         }
     }
 
-    // рисуем созданную змейку
-    markCells(self.body.concat([self.head]), "snake-body");
+    self.timerID = setInterval(self.move, parseInt(1000 / self.speed));
 }
 
 // конструктор строителя заграждений
-function BlockBuilder(ttl=25000, maxLength=3) {
+function BlockBuilder(ID, ttc, ttl=25000, maxLength=3) {
     // та же история с запусками через таймеры
     var self = this;
+    self.ID = ID;
+    // time to create
+    self.maxTTC = ttc;
+    // time to live
     self.maxTTL = ttl;
     self.maxLen = maxLength;
     self.blockCells = [];
@@ -354,15 +442,10 @@ function BlockBuilder(ttl=25000, maxLength=3) {
     // создание препятствия
     self.create = function() {
         // проверка состояния игры
-        if(!gameStarted) {
-            clearTimeout(self.timerID);
-            self.timerID = null;
-            return;
-        }
         if(gamePaused) {
             // запоминаем, что делали, когда началась пауза
             self.todo = self.create;
-            self.timerID = setInterval(self.suspend, 2000);
+            self.suspendTimerID = setInterval(self.suspend, 2000);
             return;
         }
 
@@ -389,44 +472,49 @@ function BlockBuilder(ttl=25000, maxLength=3) {
             }
         } while(!success);
         markCells(self.blockCells, "block-post");
-        self.timerID = setTimeout(self.destroy, parseInt(self.maxTTL * (0.67 + Math.random() / 3)));
+        self.ingameTimerID = setTimeout(self.remove, parseInt(self.maxTTL * (0.75 + Math.random() / 4)));
     }
 
-    // уничтожение ранее созданного препятствия
-    self.destroy = function() {
+    // снятие ранее созданного препятствия
+    self.remove = function() {
         // проверка состояния игры
-        if(!gameStarted) {
-            clearTimeout(self.timerID);
-            self.timerID = null;
-            return;
-        }
         if(gamePaused) {
             // запоминаем, что делали, когда началась пауза
-            self.todo = self.destroy;
-            self.timerID = setInterval(self.suspend, 2000);
+            self.todo = self.remove;
+            self.suspendTimerID = setInterval(self.suspend, 2000);
             return;
         }
 
         markCells(self.blockCells);
         self.blockCells = [];
-        self.timerID = setTimeout(self.create, parseInt(2000 / (Math.random() * snakeSpeed + 1)));
+        self.ingameTimerID = setTimeout(self.create, parseInt(self.maxTTC * (0.75 + Math.random() / 4)));
     }
 
     // если игра повешена на паузу, тоже вешаемся на паузу
     // и периодически проверяем статус игры
     self.suspend = function() {
         if(!gameStarted) {
-            clearInterval(self.timerID);
-            self.timerID = null;
+            clearInterval(self.suspendTimerID);
+            self.suspendTimerID = null;
             return;
         }
         if(!gamePaused) {
-            clearInterval(self.timerID);
+            clearInterval(self.suspendTimerID);
             self.todo();
         }
     }
 
-    self.timerID = setTimeout(self.create, parseInt(2000 / (Math.random() * snakeSpeed + 1)));
+    // зачистка объекта (деструктор)
+    self.destroy = function() {
+        if(self.ingameTimerID) {
+            clearTimeout(self.ingameTimerID);
+        }
+        if(self.suspendTimerID) {
+            clearInterval(self.suspendTimerID);
+        }
+    }
+
+    self.ingameTimerID = setTimeout(self.create, parseInt(self.maxTTC * (0.75 + Math.random() / 4)));
 }
 
 // глобальные переменные
@@ -435,13 +523,11 @@ var gameBoard = document.getElementById("game-board"),
     score = 0,
     yPoints = 20,
     xPoints = 20,
-    snakeSpeed = 3,
     gameStarted = false,
     gamePaused = false,
     snake,
     blocker,
-    moveTimerID,
-    foodTimerID;
+    food;
 
 // к цифиркам добавляем маленький функционал
 Number.prototype.pad = pad;
