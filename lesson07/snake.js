@@ -220,6 +220,7 @@ function FoodGrower(ttc, ttd) {
         if(gamePaused) {
             self.todo = self.grow;
             self.suspendTimerID = setInterval(self.suspend, self.TTC);
+            return;
         }
 
         do {
@@ -234,27 +235,43 @@ function FoodGrower(ttc, ttd) {
     }
 
     self.decay = function() {
+        self.ingameTimerID = null;
+
         if(gamePaused) {
             self.todo = self.decay;
-            self.suspendTimerID = setInterval(self.suspend, self.TTC);
+            self.suspendTimerID = setInterval(self.suspend, self.TTD);
+            return;
         }
 
-        self.ingameTimerID = null;
         markCells([self.location], "edible-food");
         self.reward = 1;
     }
 
     self.eat = function() {
+        score(self.reward);
+        self.location = {};
+
         if(self.ingameTimerID) {
             clearTimeout(self.ingameTimerID);
+            self.ingameTimerID = null;
         }
-        score(self.reward);
+
+        if(gamePaused) {
+            self.todo = self.grow;
+            self.suspendTimerID = setInterval(self.suspend, self.TTC);
+            return;
+        }
+
         self.ingameTimerID = setTimeout(self.grow, self.TTC);
     }
 
     self.suspend = function() {
+        if(self.ingameTimerID) {
+            clearTimeout(self.ingameTimerID);
+        }
+
         if(!gamePaused) {
-            clearInterval(self.timerID);
+            clearInterval(self.suspendTimerID);
             self.todo();
         }
     }
