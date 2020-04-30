@@ -71,8 +71,7 @@ function startGame(event) {
     gameField.style.height = `${yPoints * cellSize}px`;
 
     // стартуем нужные объекты и таймеры
-    score = 0;
-    incScore(0);
+    score = initCounter();
     // змейка начинает ползти сама как только создаётся
     snake = new Snake(snakeSpeed);
     // препятствия тоже начинают спавнится после создания, интервалы немного рандомные
@@ -131,6 +130,7 @@ function stopGame(event) {
         blocker = null;
         food.destroy();
         food = null;
+        score = null;
         gameStarted = false;
         gamePaused = false;
         // украшалки
@@ -197,9 +197,13 @@ function checkCell(xPos, yPos) {
 }
 
 // ведем счёт
-function incScore(incSize=1) {
-    score += incSize;
+function initCounter() {
+    var score = 0;
     document.getElementById("score-field").innerText = `Score: ${score.pad(5)}`;
+    return function(inc=0) {
+        score += inc;
+        document.getElementById("score-field").innerText = `Score: ${score.pad(5)}`;
+    }
 }
 
 // сажаем алюминевые огурцы на брезентовом поле
@@ -212,10 +216,14 @@ function FoodGrower(ttc, ttd) {
     self.reward = 3;
     self.location = {};
 
+    // засеваем хавчик в поле
     self.grow = function() {
+        self.ingameTimerID = null;
+
         if(gamePaused) {
             self.todo = self.grow;
             self.suspendTimerID = setInterval(self.suspend, self.TTC);
+            return;
         }
 
         do {
@@ -229,32 +237,58 @@ function FoodGrower(ttc, ttd) {
         self.ingameTimerID = setTimeout(self.decay, self.TTD);
     }
 
+    // хавчик в поле перезрел и подпортился
     self.decay = function() {
+        self.ingameTimerID = null;
+
         if(gamePaused) {
             self.todo = self.decay;
-            self.suspendTimerID = setInterval(self.suspend, self.TTC);
+            self.suspendTimerID = setInterval(self.suspend, self.TTD);
+            return;
         }
 
-        self.ingameTimerID = null;
         markCells([self.location], "edible-food");
         self.reward = 1;
     }
 
+    // хавчик был сожран
     self.eat = function() {
+        score(self.reward);
+        self.location = {};
+
         if(self.ingameTimerID) {
             clearTimeout(self.ingameTimerID);
+            self.ingameTimerID = null;
         }
-        incScore(self.reward);
+        if(self.suspendTimerID) {
+            clearInterval(self.suspendTimerID);
+            self.suspendTimerID = null;
+        }
+
+        if(gamePaused) {
+            self.todo = self.grow;
+            self.suspendTimerID = setInterval(self.suspend, self.TTC);
+            return;
+        }
+
         self.ingameTimerID = setTimeout(self.grow, self.TTC);
     }
 
+    // игра поставлена на паузу
     self.suspend = function() {
+        if(self.ingameTimerID) {
+            clearTimeout(self.ingameTimerID);
+            self.ingameTimerID = null;
+        }
+
         if(!gamePaused) {
-            clearInterval(self.timerID);
+            clearInterval(self.suspendTimerID);
+            self.suspendTimerID = null;
             self.todo();
         }
     }
 
+    // вычищаем садовода
     self.destroy = function() {
         if(self.ingameTimerID) {
             clearTimeout(self.ingameTimerID);
@@ -264,6 +298,7 @@ function FoodGrower(ttc, ttd) {
         }
     }
 
+    // запускаем садовода
     self.ingameTimerID = setTimeout(self.grow, self.TTC);
 }
 
@@ -520,7 +555,7 @@ function BlockBuilder(ID, ttc, ttl=25000, maxLength=3) {
 // глобальные переменные
 var gameBoard = document.getElementById("game-board"),
     gameField = document.getElementById("game-field"),
-    score = 0,
+    score,
     yPoints = 20,
     xPoints = 20,
     gameStarted = false,
